@@ -138,25 +138,25 @@ chrome.browserAction.onClicked.addListener(function (tab) {
  */
 chrome.extension.onConnect.addListener(function (port) { // Create message connection
 	console.assert(port.name == 'PasswordPeek');
-	
+  	
 	port.onMessage.addListener(function (msg) {
 
 		chrome.windows.getCurrent(function (currentWindow) { // Find the active tab in the current window
-			chrome.tabs.query({ active: true, windowId: currentWindow.id }, function (tabs) {
-
-				if(!pages[ tabs[0].id ]) { // Stop function if the active tab doesn't have a Peeker object
+		    chrome.tabs.query({ active: true, windowId: currentWindow.id }, function (tabs) {
+		    	
+		    	if(!pages[ tabs[0].id ]) { // Stop function if the active tab doesn't have a Peeker object
 					return false;
 				}
 
-					// Execute functions for specific commands
-				if(msg.action == 'reveal') {
+				// Execute functions for specific commands
+		    	if(msg.action == 'reveal') {
 					pages[ tabs[0].id ].reveal();
 				}
 				else if(msg.action == 'conceal') {
 					pages[ tabs[0].id ].conceal();
 				}
 
-			}); // end query
+		    }); // end query
 		}); // end getCurrent
 
 	}); // end addListener

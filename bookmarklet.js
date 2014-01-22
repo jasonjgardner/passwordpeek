@@ -2,14 +2,38 @@
  * Reveal Password Bookmarklet
  *
  * @author   Jason Gardner <im@jasongardner.co>
- * @link     http://jasongardner.co/post/35070945946/the-bookmarklet-of-revelations
+ * @link     http://www.passwordpeek.com
  */
 (function () {
     'use strict';
 
     var sticky = false, // True = click and hold to reveal. False = hover mouse to reveal.
-        inputs = document.getElementsByTagName('input'), // Find every input
-        old = document.getElementsByClassName('_passwordPeek'); // Find any existing icons from bookmarklet  
+        old = document.getElementsByClassName('_passwordPeek'), // Find any existing icons from bookmarklet
+        concealTimer = (60 * 1000), // Amount of time the password will be revealed
+        concealTimeout,
+        passwords = [],
+        inputs;
+        
+    /* Find all password fields on the page */
+
+    if (!document.querySelectorAll) { // Old browsers
+        // Find all inputs and pick out the [type="password"]
+        inputs = document.getElementsByTagName('input'); // Find every input
+
+        for (var a = 0, b = inputs.length; a < b; a++) {
+            if (inputs[a].type.toLowerCase() === 'password') {
+                passwords.push(inputs[a]);
+            }
+        }
+    } else {
+        passwords = document.querySelectorAll('input[type="password"]');
+    }
+
+    // Exit if function is not applicable to the page
+    if (passwords.length <= 0) {
+        alert('There are no passwords to reveal on this page!');
+        return false;
+    }
 
     /**
      * Find Position
@@ -68,11 +92,16 @@
         function show() { // Show password and change icon to hover state
             input.setAttribute('type', 'text');
             icon.src = 'data:image/gif;base64,R0lGODlhIAAgALMAADk8OYSChGtta83Ozefn5726vaWipVJVUvf39+fj562ure/v75SSlN7b3v///yEgISH5BAAAAAAALAAAAAAgACAAAASa0MlJq7046/26/2AoUmJpfuSphunqPu2rxrJJ1+OEz/pu96aDoVBQCHgSUyBhWTB+SZFCMyjdHoYJYkAcICZVFtAjmBAAD8ERQJg8QTemAwFgSwgCu2MhjpInBg9yd2mAcGMPBwGLaBYHD4sBjyiIfRNoUA4qAxQNSJonAF4OA5iZPqeoOX6qlKytHVeqsqi0PrY7G7q7vL0OEQA7'; // Data URI for hover icon
+
+            // Password will be automatically concealed after a certain time
+            concealTimeout = setTimeout(hide, concealTimer);
         }
 
         function hide() { // Hide password and revert icon to normal state
             input.setAttribute('type', 'password');
             icon.src = iconURI;
+
+            clearTimeout(concealTimeout);
         }
 
         // Events
@@ -98,13 +127,13 @@
         return icon;
     }
 
-    for (var a = 0, b = old.length; a < b; a++) { // Remove old icons
-        old[a].parentNode.removeChild(old[a]);
+    /* Dispatch reveal buttons */
+    
+    for (var c = 0, d = old.length; c < d; c++) { // Remove old icons
+        old[c].parentNode.removeChild(old[c]);
     }
 
-    for (var i = 0, j = inputs.length; i < j; i++) { // Insert icons next to password fields
-        if (inputs[i].type.toLowerCase() === 'password') {
-            document.body.appendChild(new Icon(inputs[i]));
-        }
+    for (var i = 0, j = passwords.length; i < j; i++) { // Insert icons next to password fields
+        document.body.appendChild(new Icon(passwords[i]));
     }
 })();

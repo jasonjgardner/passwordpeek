@@ -20,7 +20,18 @@ var port = chrome.extension.connect({ name: 'PasswordPeek' }),
  * Collection of password fields in the document
  * @type {array}
  */
-	passwords = document.querySelectorAll('input[type=password]');
+	passwords = document.querySelectorAll('input[type=password]'),
+
+/**
+ * Milliseconds to wait before automatically concealing password text
+ * @type {[type]}
+ */
+	concealTimer = (60 * 1000),
+
+/**
+ * Timeout function to automatically conceal passwords
+ */
+	concealTimeout;
 
 
 /**
@@ -31,6 +42,8 @@ function blurConceal () {
 	port.postMessage({ action: 'conceal' }); // Tell tab's Peeker to conceal passwords
 
 	this.removeEventListener('blur', blurConceal); // Clean-up event listener to avoid interference with the page functions or scripts
+
+	clearTimeout(concealTimeout);
 }
 
 
@@ -41,5 +54,15 @@ for (var i = 0, j = passwords.length; i < j; i++) {
 
 	passwords[i].addEventListener('blur', blurConceal, false); // Auto conceal this field on blur
 }
+
+// Auto blur
+concealTimeout = setTimeout(function() {
+	var event = new CustomEvent('blur', {'detail': {'timeout': true}});
+
+	for (var i = 0, j = passwords.length; i < j; i++) {
+		passwords[i].dispatchEvent(event);
+	}
+
+}, concealTimer);
 
 //@ sourceURL=reveal.js

@@ -5,6 +5,10 @@ Password Peek is a handy browser tool used to easily unmask the hidden contents 
 
 [http://www.passwordpeek.com](http://www.passwordpeek.com)
 
+Changelog
+---------
+Version 1.0 - Password fields are concealed after sixty seconds of being exposed.
+
 Credits
 -------
 
